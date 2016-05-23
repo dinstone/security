@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p" xmlns:tx="http://www.springframework.org/schema/tx" xmlns:context="http://www.springframework.org/schema/context" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd  
+										   http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.1.xsd  
+										   http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.1.xsd
+										   http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.1.xsd">
+
+	<bean id="securityPropertyPlaceholderConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="ignoreUnresolvablePlaceholders" value="true" />
+		<property name="locations">
+			<list>
+				<value>classpath:jdbc.properties</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="securityDataSource" class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName" value="${jdbc.driver}" />
+		<property name="url" value="${jdbc.url}" />
+		<property name="username" value="${jdbc.username}" />
+		<property name="password" value="${jdbc.password}" />
+		<property name="maxActive" value="${dbcp.maxActive}" />
+		<property name="minIdle" value="${dbcp.minIdle}" />
+		<property name="logAbandoned" value="${dbcp.logAbandoned}" />
+		<property name="removeAbandoned" value="${dbcp.removeAbandoned}" />
+		<property name="removeAbandonedTimeout" value="${dbcp.removeAbandonedTimeout}" />
+		<property name="validationQuery" value="${dbcp.validationQuery}" />
+	</bean>
+
+	<!-- Transaction manager for JDBC data source -->
+	<bean id="securityTransactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="securityDataSource" />
+	</bean>
+	<tx:advice id="securityDataSourceTxAdvice" transaction-manager="securityTransactionManager">
+		<tx:attributes>
+			<tx:method name="*" propagation="REQUIRED" />
+		</tx:attributes>
+	</tx:advice>
+	<aop:config>
+		<aop:advisor pointcut="execution(* com.dinstone.security.service.*Service.*(..))" advice-ref="securityDataSourceTxAdvice" />
+	</aop:config>
+
+	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+		<constructor-arg>
+			<ref bean="securityDataSource" />
+		</constructor-arg>
+	</bean>
+
+</beans>

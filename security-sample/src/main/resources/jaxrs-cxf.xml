@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxrs="http://cxf.apache.org/jaxrs"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd">
+
+	<import resource="classpath:META-INF/cxf/cxf.xml" />
+
+	<jaxrs:server address="/">
+		<jaxrs:serviceBeans>
+			<ref bean="authenticationResource" />
+		</jaxrs:serviceBeans>
+		<jaxrs:providers>
+			<bean class="com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider" />
+			<bean class="com.dinstone.security.jrs.interceptor.JrsExceptionMapper" />
+		</jaxrs:providers>
+		<jaxrs:inInterceptors>
+			<bean class="com.dinstone.security.jrs.interceptor.AuthenticationPhaseInterceptor">
+				<property name="ignoredOperations">
+					<list>
+						<value>/authen/login</value>
+					</list>
+				</property>
+			</bean>
+			<bean class="com.dinstone.security.jrs.interceptor.AuthorizationPhaseInterceptor" />
+		</jaxrs:inInterceptors>
+	</jaxrs:server>
+
+</beans>
