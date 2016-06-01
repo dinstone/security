@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.dinstone.security.jrs.interceptor;
 
 import java.io.ByteArrayOutputStream;
@@ -65,6 +66,8 @@ public class JrsExceptionMapper implements ExceptionMapper<Exception> {
             if (et == AccessControlExceptionType.FORBIDDEN) {
                 status = Status.FORBIDDEN;
             } else if (et == AccessControlExceptionType.UNAUTHORIZED) {
+                status = Status.FORBIDDEN;
+            } else if (et == AccessControlExceptionType.UNAUTHENTICATED) {
                 status = Status.UNAUTHORIZED;
             }
         }
