@@ -16,6 +16,9 @@
 
 package com.dinstone.security.web.interceptor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -33,13 +36,15 @@ import com.dinstone.security.api.AuthenticationService;
 import com.dinstone.security.api.AuthorizationService;
 import com.dinstone.security.web.CookieUtil;
 
-public class AuthorizationHandlerInterceptor extends HandlerInterceptorAdapter {
+public class AccessControlHandlerInterceptor extends HandlerInterceptorAdapter {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AuthorizationHandlerInterceptor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AccessControlHandlerInterceptor.class);
 
     private static final String AUTHENTICATION_KEY = Authentication.class.getName();
 
     private UrlPathHelper urlPathHelper = new UrlPathHelper();
+
+    private List<String> ignoredOperations = new ArrayList<String>();
 
     @Resource
     private AuthenticationService authenticationService;
@@ -50,22 +55,29 @@ public class AuthorizationHandlerInterceptor extends HandlerInterceptorAdapter {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         String operation = urlPathHelper.getLookupPathForRequest(request);
-        LOGGER.info("Authorization intercept a request operation[{}]", operation);
-
-        Authentication authentication = (Authentication) WebUtils.getSessionAttribute(request, AUTHENTICATION_KEY);
-        if (authentication == null) {
-            String authenToken = CookieUtil.getCookieValue(request, Authentication.TOKEN);
-            authentication = authenticationService.authenticate(authenToken);
+        if (!ignoredOperations.contains(operation)) {
+            LOGGER.info("AccessControl intercept a request operation[{}]", operation);
+            Authentication authentication = (Authentication) WebUtils.getSessionAttribute(request, AUTHENTICATION_KEY);
             if (authentication == null) {
-                throw new AccessControlException(AccessControlExceptionType.UNAUTHENTICATED);
-            } else {
-                WebUtils.setSessionAttribute(request, AUTHENTICATION_KEY, authentication);
+                String authenToken = CookieUtil.getCookieValue(request, Authentication.TOKEN);
+                authentication = authenticationService.authenticate(authenToken);
+                if (authentication == null) {
+                    throw new AccessControlException(AccessControlExceptionType.UNAUTHENTICATED);
+                } else {
+                    WebUtils.setSessionAttribute(request, AUTHENTICATION_KEY, authentication);
+                }
             }
+
+            authorizationService.authorize(authentication, operation);
         }
 
-        authorizationService.authorize(authentication, operation);
-
         return true;
+    }
+
+    public void setIgnoredOperations(List<String> ignoredOperations) {
+        if (ignoredOperations != null) {
+            this.ignoredOperations.addAll(ignoredOperations);
+        }
     }
 
     public void setAuthorizationService(AuthorizationService authorizationService) {

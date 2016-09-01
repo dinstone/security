@@ -22,6 +22,7 @@ import java.util.Set;
 
 import org.springframework.stereotype.Service;
 
+import com.dinstone.security.api.Authentication;
 import com.dinstone.security.api.Permission;
 import com.dinstone.security.api.Subject;
 import com.dinstone.security.dao.AccessControlDao;
@@ -67,6 +68,11 @@ public class MemoryAccessControlDao implements AccessControlDao {
 
     @Override
     public Permission findPermission(String operation) {
+        return null;
+    }
+
+    @Override
+    public Authentication findAuthentication(String authenToken) {
         return null;
     }
 

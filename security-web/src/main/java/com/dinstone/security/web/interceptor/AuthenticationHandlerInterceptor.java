@@ -19,6 +19,7 @@ package com.dinstone.security.web.interceptor;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -31,10 +32,12 @@ import org.springframework.web.util.WebUtils;
 import com.dinstone.security.api.AccessControlException;
 import com.dinstone.security.api.AccessControlExceptionType;
 import com.dinstone.security.api.Authentication;
+import com.dinstone.security.api.AuthenticationService;
+import com.dinstone.security.web.CookieUtil;
 
 public class AuthenticationHandlerInterceptor extends HandlerInterceptorAdapter {
 
-    private static final Logger logger = LoggerFactory.getLogger(AuthorizationHandlerInterceptor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AuthorizationHandlerInterceptor.class);
 
     private static final String AUTHENTICATION_KEY = Authentication.class.getName();
 
@@ -42,18 +45,27 @@ public class AuthenticationHandlerInterceptor extends HandlerInterceptorAdapter 
 
     private List<String> ignoredOperations = new ArrayList<String>();
 
+    @Resource
+    private AuthenticationService authenticationService;
+
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         String operation = urlPathHelper.getLookupPathForRequest(request);
-        logger.info("Authentication intercept a request operation[{}]", operation);
-
         // ignored operation
         if (!ignoredOperations.contains(operation)) {
+            LOGGER.info("Authentication intercept a request operation[{}]", operation);
             Authentication authentication = (Authentication) WebUtils.getSessionAttribute(request, AUTHENTICATION_KEY);
             if (authentication == null) {
-                throw new AccessControlException(AccessControlExceptionType.UNAUTHENTICATED);
+                String authenToken = CookieUtil.getCookieValue(request, Authentication.TOKEN);
+                authentication = authenticationService.authenticate(authenToken);
+                if (authentication == null) {
+                    throw new AccessControlException(AccessControlExceptionType.UNAUTHENTICATED);
+                } else {
+                    WebUtils.setSessionAttribute(request, AUTHENTICATION_KEY, authentication);
+                }
             }
         }
+
         return true;
     }
 
@@ -61,6 +73,10 @@ public class AuthenticationHandlerInterceptor extends HandlerInterceptorAdapter 
         if (ignoredOperations != null) {
             this.ignoredOperations.addAll(ignoredOperations);
         }
+    }
+
+    public void setAuthenticationService(AuthenticationService authenticationService) {
+        this.authenticationService = authenticationService;
     }
 
 }

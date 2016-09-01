@@ -13,14 +13,13 @@
 			<bean class="com.dinstone.security.jrs.interceptor.JrsExceptionMapper" />
 		</jaxrs:providers>
 		<jaxrs:inInterceptors>
-			<bean class="com.dinstone.security.jrs.interceptor.AuthenticationPhaseInterceptor">
+			<bean class="com.dinstone.security.jrs.interceptor.AccessControlPhaseInterceptor">
 				<property name="ignoredOperations">
 					<list>
 						<value>/authen/login</value>
 					</list>
 				</property>
 			</bean>
-			<bean class="com.dinstone.security.jrs.interceptor.AuthorizationPhaseInterceptor" />
 		</jaxrs:inInterceptors>
 	</jaxrs:server>
 

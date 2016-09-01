@@ -31,7 +31,7 @@ public abstract class AbstractAccessControlService implements AuthenticationServ
     @Override
     public Authentication authenticate(Account account) {
         // check account
-        if (!checkAccount(account)) {
+        if (account == null || !checkAccount(account)) {
             throw new BusinessException(AccessControlExceptionType.INVALID_ACCOUNT).setProperty("account", account);
         }
 
@@ -71,10 +71,16 @@ public abstract class AbstractAccessControlService implements AuthenticationServ
         }
     }
 
+    /**
+     * check the account if is valid.
+     * 
+     * @param account
+     * @return
+     */
     protected abstract boolean checkAccount(Account account);
 
     /**
-     * create authentication object.
+     * create an authentication object.
      *
      * @param account
      * @return
@@ -82,7 +88,7 @@ public abstract class AbstractAccessControlService implements AuthenticationServ
     protected abstract Authentication createAuthentication(Account account);
 
     /**
-     * check operation's permission.
+     * find the operation's permission.
      *
      * @param operation
      * @return

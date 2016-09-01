@@ -24,11 +24,12 @@ import javax.servlet.jsp.tagext.TagSupport;
 
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.support.RequestContextUtils;
-import org.springframework.web.util.WebUtils;
 
 import com.dinstone.security.api.AccessControlException;
 import com.dinstone.security.api.Authentication;
+import com.dinstone.security.api.AuthenticationService;
 import com.dinstone.security.api.AuthorizationService;
+import com.dinstone.security.web.CookieUtil;
 
 public class AccessControlTag extends TagSupport {
 
@@ -36,8 +37,6 @@ public class AccessControlTag extends TagSupport {
     private static final long serialVersionUID = 1L;
 
     private String operation;
-
-    private String decision = "accessControlService";
 
     /*
      * (non-Javadoc)
@@ -58,13 +57,17 @@ public class AccessControlTag extends TagSupport {
     public int doStartTag() throws JspException {
         ServletContext servletContext = pageContext.getServletContext();
         HttpServletRequest request = (HttpServletRequest) pageContext.getRequest();
-        WebApplicationContext wac = RequestContextUtils.getWebApplicationContext(request, servletContext);
+        String authenToken = CookieUtil.getCookieValue(request, Authentication.TOKEN);
+        if (authenToken == null) {
+            return Tag.SKIP_BODY;
+        }
 
-        AuthorizationService accessControlAuthorization = (AuthorizationService) wac.getBean(decision);
-        Authentication authentication = (Authentication) WebUtils.getSessionAttribute(request,
-            Authentication.class.getName());
+        WebApplicationContext wac = RequestContextUtils.getWebApplicationContext(request, servletContext);
+        AuthenticationService authenticationService = wac.getBean(AuthenticationService.class);
+        AuthorizationService authorizationService = wac.getBean(AuthorizationService.class);
         try {
-            accessControlAuthorization.authorize(authentication, operation);
+            Authentication authen = authenticationService.authenticate(authenToken);
+            authorizationService.authorize(authen, operation);
         } catch (AccessControlException e) {
             return Tag.SKIP_BODY;
         }
@@ -74,10 +77,6 @@ public class AccessControlTag extends TagSupport {
 
     public void setOperation(String operation) {
         this.operation = operation;
-    }
-
-    public void setDecision(String decision) {
-        this.decision = decision;
     }
 
 }

@@ -18,6 +18,7 @@ package com.dinstone.security.dao;
 
 import java.util.Set;
 
+import com.dinstone.security.api.Authentication;
 import com.dinstone.security.api.Permission;
 import com.dinstone.security.api.Subject;
 import com.dinstone.security.spi.DefaultAccount;
@@ -31,5 +32,7 @@ public interface AccessControlDao {
     Set<Permission> findPermissions(String principal);
 
     Permission findPermission(String operation);
+
+    Authentication findAuthentication(String authenToken);
 
 }

@@ -15,14 +15,13 @@
 	<mvc:annotation-driven />
 
 	<mvc:interceptors>
-		<bean class="com.dinstone.security.web.interceptor.AuthenticationHandlerInterceptor">
+		<bean class="com.dinstone.security.web.interceptor.AccessControlHandlerInterceptor">
 			<property name="ignoredOperations">
 				<list>
 					<value>/account/login.do</value>
 				</list>
 			</property>
 		</bean>
-		<bean class="com.dinstone.security.web.interceptor.AuthorizationHandlerInterceptor" />
 	</mvc:interceptors>
 
 	<bean class="com.dinstone.security.web.interceptor.WebExceptionResolver" />

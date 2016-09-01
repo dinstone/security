@@ -14,30 +14,23 @@
  * limitations under the License.
  */
 
-package com.dinstone.security.api;
+package com.dinstone.security.web;
 
-/**
- * 认证服务
- * 
- * @author dinstone
- * @version 1.0.0
- */
-public interface AuthenticationService {
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 
-    /**
-     * authenticate the account.
-     *
-     * @param account
-     * @return
-     */
-    public Authentication authenticate(Account account);
+public class CookieUtil {
 
-    /**
-     * authenticate the token.
-     *
-     * @param account
-     * @return
-     */
-    public Authentication authenticate(String authenToken);
+    public static String getCookieValue(HttpServletRequest request, String name) {
+        Cookie cookies[] = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (name.equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
+        }
+        return null;
+    }
 
 }

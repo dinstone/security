@@ -16,6 +16,7 @@
 
 package com.dinstone.security.spi;
 
+import java.util.Date;
 import java.util.Set;
 
 import javax.annotation.Resource;
@@ -23,17 +24,31 @@ import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 
 import com.dinstone.security.api.AbstractAccessControlService;
+import com.dinstone.security.api.AccessControlException;
+import com.dinstone.security.api.AccessControlExceptionType;
 import com.dinstone.security.api.Account;
 import com.dinstone.security.api.Authentication;
 import com.dinstone.security.api.Permission;
 import com.dinstone.security.api.Subject;
 import com.dinstone.security.dao.AccessControlDao;
 
-@Service("accessControlService")
+@Service
 public class DefaultAccessControlService extends AbstractAccessControlService {
 
     @Resource
     private AccessControlDao accessControlDao;
+
+    @Override
+    public Authentication authenticate(String authenToken) {
+        Authentication authen = accessControlDao.findAuthentication(authenToken);
+        Date now = new Date();
+        if (authen == null || now.getTime() > authen.getExpiration()) {
+            AccessControlException acException = new AccessControlException(AccessControlExceptionType.UNAUTHENTICATED);
+            acException.setProperty("authenToken", authenToken);
+            throw acException;
+        }
+        return authen;
+    }
 
     @Override
     protected Authentication createAuthentication(Account account) {

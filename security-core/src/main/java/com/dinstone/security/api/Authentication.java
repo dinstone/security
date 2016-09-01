@@ -20,6 +20,8 @@ import java.util.Set;
 
 public interface Authentication {
 
+    public final String TOKEN = "AUTHENTOKEN";
+
     public String getToken();
 
     public Object getPrincipal();
