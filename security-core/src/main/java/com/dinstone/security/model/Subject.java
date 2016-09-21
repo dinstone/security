@@ -14,13 +14,11 @@
  * limitations under the License.
  */
 
-package com.dinstone.security.spi;
+package com.dinstone.security.model;
 
 import java.io.Serializable;
 
-import com.dinstone.security.api.Subject;
-
-public class DefaultSubject implements Subject, Serializable {
+public class Subject implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -28,15 +26,6 @@ public class DefaultSubject implements Subject, Serializable {
 
     private String name;
 
-    private int createBy;
-
-    private long createTime;
-
-    private int updateBy;
-
-    private long updateTime;
-
-    @Override
     public String getId() {
         return id;
     }
@@ -45,7 +34,6 @@ public class DefaultSubject implements Subject, Serializable {
         this.id = id;
     }
 
-    @Override
     public String getName() {
         return name;
     }
@@ -54,36 +42,9 @@ public class DefaultSubject implements Subject, Serializable {
         this.name = name;
     }
 
-    public int getCreateBy() {
-        return createBy;
-    }
-
-    public void setCreateBy(int createBy) {
-        this.createBy = createBy;
-    }
-
-    public long getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(long createTime) {
-        this.createTime = createTime;
-    }
-
-    public int getUpdateBy() {
-        return updateBy;
-    }
-
-    public void setUpdateBy(int updateBy) {
-        this.updateBy = updateBy;
-    }
-
-    public long getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(long updateTime) {
-        this.updateTime = updateTime;
+    @Override
+    public String toString() {
+        return "Subject [id=" + id + ", name=" + name + "]";
     }
 
 }

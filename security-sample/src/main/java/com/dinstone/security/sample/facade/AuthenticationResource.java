@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.dinstone.security.sample.facade;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -27,10 +27,8 @@ import javax.ws.rs.core.MediaType;
 
 import org.springframework.stereotype.Service;
 
-import com.dinstone.security.api.Account;
-import com.dinstone.security.api.Authentication;
-import com.dinstone.security.api.AuthenticationService;
-import com.dinstone.security.spi.DefaultAccount;
+import com.dinstone.security.model.Authentication;
+import com.dinstone.security.service.AuthenticateService;
 
 @Service
 @Path("/authen")
@@ -38,21 +36,13 @@ import com.dinstone.security.spi.DefaultAccount;
 public class AuthenticationResource {
 
     @Resource
-    private AuthenticationService authenticationService;
+    private AuthenticateService authenticateService;
 
     @GET
     @Path("/login")
     public Authentication login(@QueryParam("username") String username, @QueryParam("password") String password,
             @QueryParam("force") boolean force, @Context HttpServletRequest request) {
-        Account account = new DefaultAccount(username, password);
-        Authentication authen = authenticationService.authenticate(account);
-        HttpSession session = request.getSession(true);
-        session.setAttribute(Authentication.class.getName(), authen);
-        return authen;
-    }
-
-    public void setAuthenticationService(AuthenticationService authenticationService) {
-        this.authenticationService = authenticationService;
+        return null;
     }
 
 }

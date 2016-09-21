@@ -15,16 +15,32 @@
 	<mvc:annotation-driven />
 
 	<mvc:interceptors>
-		<bean class="com.dinstone.security.web.interceptor.AccessControlHandlerInterceptor">
+		<bean class="com.dinstone.security.web.interceptor.AuthenHandlerInterceptor">
 			<property name="ignoredOperations">
 				<list>
-					<value>/account/login.do</value>
+					<value>/authen/callback.do</value>
+					<value>/authen/check.do</value>
 				</list>
 			</property>
 		</bean>
 	</mvc:interceptors>
 
-	<bean class="com.dinstone.security.web.interceptor.WebExceptionResolver" />
+	<bean id="exceptionResolver" class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+		<property name="defaultErrorView">
+			<value>error/500</value>
+		</property>
+		<property name="defaultStatusCode">
+			<value>500</value>
+		</property>
+		<property name="warnLogCategory">
+			<value>org.springframework.web.servlet.handler.AbstractHandlerExceptionResolver</value>
+		</property>
+		<property name="exceptionMappings">
+			<props>
+				<prop key="com.dinstone.security.AccessControlException">forward:/authen/check.do</prop>
+			</props>
+		</property>
+	</bean>
 
 	<bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
 		<property name="supportedMediaTypes">

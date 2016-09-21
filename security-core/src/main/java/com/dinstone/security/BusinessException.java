@@ -17,7 +17,7 @@
 package com.dinstone.security;
 
 /**
- * BusinessException表示违法业务规则导致的异常，需要调用者根据异常类型来处理；
+ * BusinessException表示违反业务规则导致的异常，需要调用者根据异常类型来处理；
  *
  * @author guojinfei
  * @version 1.0.0

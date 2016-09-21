@@ -33,11 +33,11 @@ import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.dinstone.security.api.AccessControlException;
-import com.dinstone.security.api.AccessControlExceptionType;
-import com.dinstone.security.api.Authentication;
-import com.dinstone.security.api.AuthenticationService;
-import com.dinstone.security.api.AuthorizationService;
+import com.dinstone.security.AccessControlException;
+import com.dinstone.security.AccessControlExceptionType;
+import com.dinstone.security.Constant;
+import com.dinstone.security.model.Authentication;
+import com.dinstone.security.service.AuthenticateService;
 
 /**
  * 认证授权拦截器
@@ -45,21 +45,16 @@ import com.dinstone.security.api.AuthorizationService;
  * @author dinstone
  * @version 1.0.0
  */
-public class AccessControlPhaseInterceptor extends AbstractPhaseInterceptor<Message> {
+public class AuthenPhaseInterceptor extends AbstractPhaseInterceptor<Message> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AccessControlPhaseInterceptor.class);
-
-    private static final String AUTHENTICATION_KEY = Authentication.class.getName();
+    private static final Logger LOGGER = LoggerFactory.getLogger(AuthenPhaseInterceptor.class);
 
     private List<String> ignoredOperations = new ArrayList<String>();
 
     @Resource
-    private AuthenticationService authenticationService;
+    private AuthenticateService authenticateService;
 
-    @Resource
-    private AuthorizationService authorizationService;
-
-    public AccessControlPhaseInterceptor() {
+    public AuthenPhaseInterceptor() {
         super(Phase.RECEIVE);
     }
 
@@ -69,19 +64,17 @@ public class AccessControlPhaseInterceptor extends AbstractPhaseInterceptor<Mess
         if (!ignoredOperations.contains(operation)) {
             LOGGER.info("AccessControl intercept a request operation[{}]", operation);
             Session session = message.getExchange().getSession();
-            Authentication authentication = (Authentication) session.get(AUTHENTICATION_KEY);
+            Authentication authentication = (Authentication) session.get(Constant.AUTHEN_KEY_SESSION);
             if (authentication == null) {
                 HttpServletRequest request = (HttpServletRequest) message.get(AbstractHTTPDestination.HTTP_REQUEST);
-                String authenToken = getCookieValue(request, Authentication.TOKEN);
-                authentication = authenticationService.authenticate(authenToken);
+                String authenToken = getCookieValue(request, Constant.AUTHEN_TOKEN_COOKIE);
+                authentication = authenticateService.checkAuthenToken(authenToken);
                 if (authentication == null) {
                     throw new AccessControlException(AccessControlExceptionType.UNAUTHENTICATED);
                 } else {
-                    session.put(AUTHENTICATION_KEY, authentication);
+                    session.put(Constant.AUTHEN_KEY_SESSION, authentication);
                 }
             }
-
-            authorizationService.authorize(authentication, operation);
         }
 
     }

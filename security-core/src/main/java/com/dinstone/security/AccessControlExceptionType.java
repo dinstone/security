@@ -14,22 +14,9 @@
  * limitations under the License.
  */
 
-package com.dinstone.security.api;
+package com.dinstone.security;
 
-import java.util.Set;
 
-public interface Authentication {
-
-    public final String TOKEN = "AUTHENTOKEN";
-
-    public String getToken();
-
-    public Object getPrincipal();
-
-    public Subject getSubject();
-
-    public Set<Permission> getPermissions();
-
-    public int getExpiration();
-
+public enum AccessControlExceptionType implements ExceptionType {
+    INVALID_ACCOUNT, UNAUTHENTICATED, UNAUTHORIZED, FORBIDDEN;
 }

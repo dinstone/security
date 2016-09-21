@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-package com.dinstone.security.api;
+package com.dinstone.security.service;
+
+import com.dinstone.security.model.Authentication;
 
 /**
  * 认证服务
@@ -22,22 +24,22 @@ package com.dinstone.security.api;
  * @author dinstone
  * @version 1.0.0
  */
-public interface AuthenticationService {
+public interface AuthenticateService {
 
     /**
-     * authenticate the account.
+     * check the authentication token.
      *
      * @param account
      * @return
      */
-    public Authentication authenticate(Account account);
+    public Authentication checkAuthenToken(String authenToken);
 
     /**
-     * authenticate the token.
+     * check the authen ticket. the ticket from authentication.
      *
      * @param account
      * @return
      */
-    public Authentication authenticate(String authenToken);
+    public Authentication checkAuthenTicket(String authenTicket);
 
 }

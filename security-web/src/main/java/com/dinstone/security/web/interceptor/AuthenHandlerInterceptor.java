@@ -29,46 +29,40 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 import org.springframework.web.util.UrlPathHelper;
 import org.springframework.web.util.WebUtils;
 
-import com.dinstone.security.api.AccessControlException;
-import com.dinstone.security.api.AccessControlExceptionType;
-import com.dinstone.security.api.Authentication;
-import com.dinstone.security.api.AuthenticationService;
-import com.dinstone.security.api.AuthorizationService;
+import com.dinstone.security.AccessControlException;
+import com.dinstone.security.AccessControlExceptionType;
+import com.dinstone.security.Constant;
+import com.dinstone.security.model.Authentication;
+import com.dinstone.security.service.AuthenticateService;
 import com.dinstone.security.web.CookieUtil;
 
-public class AccessControlHandlerInterceptor extends HandlerInterceptorAdapter {
+public class AuthenHandlerInterceptor extends HandlerInterceptorAdapter {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AccessControlHandlerInterceptor.class);
-
-    private static final String AUTHENTICATION_KEY = Authentication.class.getName();
+    private static final Logger LOGGER = LoggerFactory.getLogger(AuthenHandlerInterceptor.class);
 
     private UrlPathHelper urlPathHelper = new UrlPathHelper();
 
     private List<String> ignoredOperations = new ArrayList<String>();
 
     @Resource
-    private AuthenticationService authenticationService;
-
-    @Resource
-    private AuthorizationService authorizationService;
+    private AuthenticateService authenticateService;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         String operation = urlPathHelper.getLookupPathForRequest(request);
         if (!ignoredOperations.contains(operation)) {
             LOGGER.info("AccessControl intercept a request operation[{}]", operation);
-            Authentication authentication = (Authentication) WebUtils.getSessionAttribute(request, AUTHENTICATION_KEY);
+            Authentication authentication = (Authentication) WebUtils.getSessionAttribute(request,
+                Constant.AUTHEN_KEY_SESSION);
             if (authentication == null) {
-                String authenToken = CookieUtil.getCookieValue(request, Authentication.TOKEN);
-                authentication = authenticationService.authenticate(authenToken);
+                String authenToken = CookieUtil.getCookieValue(request, Constant.AUTHEN_TOKEN_COOKIE);
+                authentication = authenticateService.checkAuthenToken(authenToken);
                 if (authentication == null) {
                     throw new AccessControlException(AccessControlExceptionType.UNAUTHENTICATED);
                 } else {
-                    WebUtils.setSessionAttribute(request, AUTHENTICATION_KEY, authentication);
+                    WebUtils.setSessionAttribute(request, Constant.AUTHEN_KEY_SESSION, authentication);
                 }
             }
-
-            authorizationService.authorize(authentication, operation);
         }
 
         return true;
@@ -78,14 +72,6 @@ public class AccessControlHandlerInterceptor extends HandlerInterceptorAdapter {
         if (ignoredOperations != null) {
             this.ignoredOperations.addAll(ignoredOperations);
         }
-    }
-
-    public void setAuthorizationService(AuthorizationService authorizationService) {
-        this.authorizationService = authorizationService;
-    }
-
-    public void setAuthenticationService(AuthenticationService authenticationService) {
-        this.authenticationService = authenticationService;
     }
 
 }

@@ -14,22 +14,25 @@
  * limitations under the License.
  */
 
-package com.dinstone.security.api;
+package com.dinstone.security;
 
 
 /**
- * 授权服务
  * 
- * @author dinstone
+ * @author  dinstone
  * @version 1.0.0
  */
-public interface AuthorizationService {
+public class AccessControlException extends ApplicationException {
 
-    /**
-     * authorize the operation.
-     *
-     * @param authentication
-     * @param operation
-     */
-    void authorize(Authentication authentication, Object operation);
+    /**  */
+    private static final long serialVersionUID = 1L;
+
+    public AccessControlException(ExceptionType errorType) {
+        super(errorType);
+    }
+
+    public AccessControlException(ExceptionType errorType, Throwable cause) {
+        super(errorType, cause);
+    }
+
 }

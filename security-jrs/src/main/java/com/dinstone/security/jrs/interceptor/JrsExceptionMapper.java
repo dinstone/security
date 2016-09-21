@@ -30,15 +30,15 @@ import javax.ws.rs.ext.ExceptionMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.dinstone.security.AccessControlException;
+import com.dinstone.security.AccessControlExceptionType;
 import com.dinstone.security.ApplicationException;
 import com.dinstone.security.BusinessException;
 import com.dinstone.security.ExceptionType;
-import com.dinstone.security.api.AccessControlException;
-import com.dinstone.security.api.AccessControlExceptionType;
 
 /**
- * @author guojinfei
- * @version 1.0.0.2014-7-15
+ * @author dinstone
+ * @version 1.0.0
  */
 public class JrsExceptionMapper implements ExceptionMapper<Exception> {
 

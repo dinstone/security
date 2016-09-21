@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<configuration>
+	<property>
+		<name>uams.authen.token.url</name>
+		<value>http://localhost:8080/uams/api/authen/token/</value>
+	</property>
+	<property>
+		<name>uams.authen.ticket.url</name>
+		<value>http://localhost:8080/uams/api/authen/ticket/</value>
+	</property>
+	<property>
+		<name>uams.authen.login.url</name>
+		<value>http://192.168.1.33:8080/uams/authen/login.do?scu=http://localhost:8080/sample/authen/callback.do</value>
+	</property>
+	<property>
+		<name>authen.check.ok</name>
+		<value>forward:/account/info.do</value>
+	</property>
+</configuration>

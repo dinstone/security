@@ -13,13 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.dinstone.security.api;
 
+package com.dinstone.security;
 
-public interface Subject {
+public abstract class Constant {
 
-    public abstract String getName();
+    public static final String AUTHEN_TOKEN_COOKIE = "AuthenToken";
 
-    public abstract String getId();
+    public static final String AUTHEN_KEY_SESSION = "AuthenKey";
+
+    public static final String AUTHEN_TICKET_PARAM = "atp";
+
+    public static final String AUTHEN_RENEW_PARAM = "renew";
+
+    public static final String AUTHEN_CALLBACK_PARAM = "scu";
+
+    public static final String AUTHEN_WARN_PARAM = "warn";
 
 }
